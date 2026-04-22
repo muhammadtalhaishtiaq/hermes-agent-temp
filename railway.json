@@ -11,21 +11,14 @@
     "restartPolicyType": "on_failure",
     "restartPolicyMaxRetries": 10
   },
-  "services": {
-    "hermes": {
-      "source": {
-        "repo": "muhammadtalhaishtiaq/hermes-agent-temp"
-      },
-      "volumes": [
-        {
-          "mountPath": "/data",
-          "name": "hermes-data"
-        }
-      ],
-      "variables": {
-        "ADMIN_USERNAME": "admin",
-        "ADMIN_PASSWORD": "${{ shared.passphrase }}"
-      }
+  "variables": {
+    "ADMIN_USERNAME": "admin",
+    "ADMIN_PASSWORD": "${{ shared.passphrase }}"
+  },
+  "volumes": [
+    {
+      "mountPath": "/data",
+      "name": "hermes-data"
     }
-  }
+  ]
 }

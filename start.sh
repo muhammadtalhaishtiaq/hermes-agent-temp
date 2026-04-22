@@ -16,4 +16,8 @@ fi
 
 [ ! -f /data/.hermes/.env ] && touch /data/.hermes/.env
 
+# Permission safeguard: Ensure the volume is writable by the app
+chown -R root:root /data
+chmod -R 755 /data
+
 exec python /app/server.py
