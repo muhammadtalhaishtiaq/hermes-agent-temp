@@ -64,13 +64,20 @@ HERMES_DASHBOARD_URL = f"http://{HERMES_DASHBOARD_HOST}:{HERMES_DASHBOARD_PORT}"
 # ways that produced spurious 401s.
 HOP_BY_HOP = {"host", "transfer-encoding"}
 
-ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
-if not ADMIN_PASSWORD:
-    ADMIN_PASSWORD = secrets.token_urlsafe(16)
-    print(f"[server] Admin credentials — username: {ADMIN_USERNAME}  password: {ADMIN_PASSWORD}", flush=True)
+ADMIN_USERNAME_DEFAULT = os.environ.get("ADMIN_USERNAME", "admin")
+GENERATED_ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
+if not GENERATED_ADMIN_PASSWORD:
+    GENERATED_ADMIN_PASSWORD = secrets.token_urlsafe(16)
+    print(f"[server] Admin credentials — username: {ADMIN_USERNAME_DEFAULT}  password: {GENERATED_ADMIN_PASSWORD}", flush=True)
 else:
-    print(f"[server] Admin username: {ADMIN_USERNAME}", flush=True)
+    print(f"[server] Admin username: {ADMIN_USERNAME_DEFAULT}", flush=True)
+
+def get_admin_creds() -> tuple[str, str]:
+    """Dynamically fetch admin credentials, prioritizing the user's .env file."""
+    env_data = read_env(ENV_FILE)
+    username = env_data.get("ADMIN_USERNAME") or ADMIN_USERNAME_DEFAULT
+    password = env_data.get("ADMIN_PASSWORD") or GENERATED_ADMIN_PASSWORD
+    return username, password
 
 # ── Env helpers ──────────────────────────────────────────────────────────────
 def read_env(path: Path) -> dict[str, str]:
@@ -282,8 +289,10 @@ async def login_post(request: Request) -> Response:
     password = str(form.get("password", ""))
     return_to = _safe_return_to(str(form.get("returnTo", "/")))
 
-    valid_user = _hmac.compare_digest(username, ADMIN_USERNAME)
-    valid_pw = _hmac.compare_digest(password, ADMIN_PASSWORD)
+    expected_user, expected_pw = get_admin_creds()
+
+    valid_user = _hmac.compare_digest(username, expected_user)
+    valid_pw = _hmac.compare_digest(password, expected_pw)
     if valid_user and valid_pw:
         resp = RedirectResponse(return_to, status_code=302)
         resp.set_cookie(
