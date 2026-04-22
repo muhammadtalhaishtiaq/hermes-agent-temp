@@ -561,21 +561,19 @@ async def route_health(request: Request):
 
 
 # ── App lifecycle ─────────────────────────────────────────────────────────────
-async def config_watcher():
-    """Silently watches the config file and starts the gateway when ready."""
-    while True:
-        if gw.state in ("stopped", "error") and is_config_complete():
-            print("[server] Config complete detected. Starting gateway...", flush=True)
-            await gw.start()
-        await asyncio.sleep(5)
-
+async def auto_start():
+    """Start the gateway once at boot if configured."""
+    if is_config_complete():
+        print("[server] Config complete detected at boot. Starting gateway...", flush=True)
+        await gw.start()
+    else:
+        print("[server] Config incomplete — gateway not started.", flush=True)
 
 @asynccontextmanager
 async def lifespan(app):
-    # Dashboard runs always — it's the user-facing UI after setup is done,
-    # and it's independent of gateway state.
+    # Dashboard runs always
     asyncio.create_task(dash.start())
-    asyncio.create_task(config_watcher())
+    await auto_start()
     try:
         yield
     finally:
