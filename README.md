@@ -2,7 +2,7 @@
 
 Deploy [Hermes Agent](https://github.com/NousResearch/hermes-agent) on [Railway](https://railway.app) instantly. This template features an ultra-sleek, secure "Hermes Noir" proxy gateway that provides persistent authentication in front of the **Native Hermes Dashboard**.
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/hermes-agent-ai?referralCode=QXdhdr&utm_medium=integration&utm_source=template&utm_campaign=generic)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/QphSEQ?referralCode=esHxBp&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
 > Hermes Agent is an autonomous AI agent by [Nous Research](https://nousresearch.com/) that lives on your server, connects to your messaging channels (Telegram, Discord, Slack, etc.), and gets more capable the longer it runs.
 
