@@ -1,24 +1,13 @@
 """
-Hermes Agent — Railway admin server.
+Hermes Agent — Railway Admin Proxy.
 
 Responsibilities:
-  - Admin UI / setup wizard at /setup (Starlette + Jinja, cookie-auth guarded)
-  - Management API at /setup/api/* (config, status, logs, gateway, pairing)
-  - Reverse proxy at / and /* → native Hermes dashboard (hermes_cli/web_server, on 127.0.0.1:9119)
-  - Managed subprocesses: `hermes gateway` (agent) and `hermes dashboard` (native UI)
-  - Cookie-based session auth at /login (HMAC-signed, 7-day expiry, httponly)
-
-Auth model: Basic Auth was dropped in favor of cookies because the Hermes React
-SPA's plain fetch() calls do not reliably include basic-auth creds across browsers,
-and basic-auth's per-directory protection space forced separate prompts for
-/setup and /. Cookies auto-include on every same-origin request, so both the
-setup UI and the proxied dashboard work with a single login. The cookie signing
-secret is regenerated on every process start, so any ADMIN_PASSWORD change on
-Railway (which triggers a redeploy) invalidates all existing sessions.
-
-First-visit behavior: if no provider+model config exists, GET / redirects to /setup.
-Once configured, / proxies to the Hermes dashboard. A small "← Setup" widget is
-injected into every proxied HTML response so users can always return to the wizard.
+  - Transparent Auth Proxy: Secures the native Hermes Dashboard behind a film-grain login screen.
+  - Process Manager: Automatically starts `hermes gateway` (the AI agent) and `hermes dashboard` (native UI).
+  - Reverse Proxy: Tunnels all authenticated traffic securely to the native dashboard running on 127.0.0.1:9119.
+  
+All configuration (API keys, models, channels) is handled directly inside the native Hermes Dashboard. 
+Credentials (ADMIN_USERNAME / ADMIN_PASSWORD) can be securely changed via the native `.env` editor.
 """
 
 import asyncio
