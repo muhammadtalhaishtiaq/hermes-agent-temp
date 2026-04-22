@@ -555,6 +555,11 @@ async def route_setup_404(request: Request) -> Response:
     return Response("Not Found", status_code=404, media_type="text/plain")
 
 
+async def route_health(request: Request):
+    """Unauthenticated health endpoint for Railway/Docker health checks."""
+    return JSONResponse({"status": "ok", "gateway": gw.state})
+
+
 # ── App lifecycle ─────────────────────────────────────────────────────────────
 async def config_watcher():
     """Silently watches the config file and starts the gateway when ready."""
@@ -589,6 +594,7 @@ ANY_METHOD = ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"]
 
 routes = [
     # Public — no auth required.
+    Route("/health",                            route_health),
     Route("/login",                             page_login,          methods=["GET"]),
     Route("/login",                             login_post,          methods=["POST"]),
     Route("/logout",                            logout),
